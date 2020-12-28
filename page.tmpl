@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{{.Name}}-{{.Version}}</title>
+</head>
+<body>
+  <div class="title">
+    <h1>{{.Name}}-{{.Version}}</h1>
+  </div>
+
+  <div class="description">
+    <h2>Description</h2>
+    <ul>
+      <li><p>{{.Description}}</p></li>
+      <!-- <li><p>{{.LongDescription}}</p></li> -->
+    </ul>
+  </div>
+
+  <div class="depends">
+    <h2>Depends</h2>
+    <ul>{{range .Depends}}
+      <li>{{ . }}</li>
+    {{end}}<ul>
+  </div>
+</body>
+</html>
+
