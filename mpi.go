@@ -174,7 +174,7 @@ func scanStanza(stream *bufio.Scanner) (map[string]string, error) {
 }
 
 func parsePackages(pkgs string) error {
-	log.Println("Fetching and parsing", pkgs)
+	//log.Println("Fetching and parsing", pkgs)
 
 	f, err := http.Get(pkgs)
 	if err != nil {
@@ -183,7 +183,7 @@ func parsePackages(pkgs string) error {
 
 	uncompressed, err := gzip.NewReader(f.Body)
 	if err != nil {
-		log.Printf("Warning: %s: %s", pkgs, err)
+		//log.Printf("Warning: %s: %s", pkgs, err)
 		return nil
 	}
 
