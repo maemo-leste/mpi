@@ -1,6 +1,6 @@
 package main
 
-var outputPath = "./out"
+var outputPath = "./"
 
 var architectures = []string{"binary-amd64", "binary-armhf", "binary-arm64"}
 
@@ -18,6 +18,7 @@ var components = []string{
 	"raspberrypi",
 }
 
-var url = "https://maedevu.maemo.org/leste/dists"
+var mainurl = "https://maedevu.maemo.org/leste/dists"
+var extrasurl = "https://maedevu.maemo.org/extras/dists"
 
-var suites = []string{"beowulf"}
+var suites = []string{"beowulf", "beowulf-devel"}

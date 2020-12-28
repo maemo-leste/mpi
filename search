@@ -1,0 +1,84 @@
+#!/bin/sh
+
+PKGPATHS="${DOCUMENT_ROOT}/pkgweb/beowulf ${DOCUMENT_ROOT}/pkgweb/beowulf-devel"
+
+QUERY="$(printf "%s" "$REQUEST_URI" | awk -F'q=' '{print $2}' | awk -F'%20' '{print $1}')"
+
+cat <<EOF
+Content-Type: text/html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Search results for: $QUERY</title>
+  <link rel="icon" href="/pkgweb/favicon.ico">
+  <link rel="stylesheet" href="/pkgweb/bootstrap.min.css">
+  <link rel="stylesheet" href="/pkgweb/fonts.css">
+  <link rel="stylesheet" href="/pkgweb/nest.css">
+  <link rel="stylesheet" href="/pkgweb/pygment.css">
+</head>
+<body>
+  <div class="header-container gradient">
+    <div class="container">
+      <div class="header-nav">
+        <div class="header-logo">
+          <a class="pull-left" href="https://maedevu.maemo.org/pkgweb/">
+            <img class="mr20" src="/pkgweb/logo_small_w.png" alt="logo">Maemo Package Index
+          </a>
+       </div>
+       <div class="nav pull-right">
+         <a href="https://maemo-leste.github.io">News</a>
+         <a href="https://leste.maemo.org">Wiki</a>
+       </div>
+     </div>
+   </div>
+  </div>
+
+  <div class="container content">
+    <form action="/pkgweb/search">
+      <input type="text" placeholder="$QUERY" requred name="q">
+      <input type="submit" class="btn btn-primary">
+    </form>
+    <hr>
+
+EOF
+
+beowulf_pkgs="$(find "${DOCUMENT_ROOT}/pkgweb/beowulf" -type f -name "*${QUERY}*.html" \
+	| sed -e "s,${DOCUMENT_ROOT}/pkgweb/beowulf/,," -e 's,\.html$,,' | sort -u)"
+
+if [ -n "$beowulf_pkgs" ]; then
+	echo "    <h2>Packages found in beowulf:</h2>"
+	for i in $beowulf_pkgs; do
+		echo "<a href=\"/pkgweb/beowulf/${i}.html\">$i</a><br>"
+	done
+fi
+
+beowulfdevel_pkgs="$(find "${DOCUMENT_ROOT}/pkgweb/beowulf-devel" -type f -name "*${QUERY}*.html" \
+	| sed -e "s,${DOCUMENT_ROOT}/pkgweb/beowulf-devel/,," -e 's,\.html$,,' | sort -u)"
+
+if [ -n "$beowulfdevel_pkgs" ]; then
+	echo "    <h2>Packages found in beowulf-devel:</h2>"
+	for i in $beowulfdevel_pkgs; do
+		echo "<a href=\"/pkgweb/beowulf-devel/${i}.html\">$i</a><br>"
+	done
+fi
+
+if [ -z "$beowulf_pkgs" ] && [ -z "$beowulfdevel_pkgs" ]; then
+
+	cat <<EOF
+<p>It seems there are no results for <b>$QUERY</b> in Maemo Leste. Perhaps try
+searching upstream Devuan using the following link:</p>
+
+<p><a href="https://pkginfo.devuan.org/xsl-bin/policy-query.html?c=package&q=${QUERY}">
+https://pkginfo.devuan.org/xsl-bin/policy-query.html?c=package&q=${QUERY}</a></p>
+EOF
+
+fi
+
+cat <<EOF
+</body>
+</html>
+EOF
+
+exit 0

@@ -1,28 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
+<!--
+Package: {{.Package}}
+Architecture: {{.Architecture}}
+Version: {{.Version}}
+Extras: {{.Extras}}
+-->
 <head>
   <meta charset="utf-8">
-  <title>{{.Name}}-{{.Version}}</title>
+  <title>{{.Package}}-{{.Version}}</title>
+  <link rel="icon" href="/pkgweb/favicon.ico">
+  <link rel="stylesheet" href="/pkgweb/bootstrap.min.css">
+  <link rel="stylesheet" href="/pkgweb/fonts.css">
+  <link rel="stylesheet" href="/pkgweb/nest.css">
+  <link rel="stylesheet" href="/pkgweb/pygment.css">
 </head>
 <body>
-  <div class="title">
-    <h1>{{.Name}}-{{.Version}}</h1>
+  <div class="header-container gradient">
+    <div class="container">
+      <div class="header-nav">
+        <div class="header-logo">
+          <a class="pull-left" href="https://maedevu.maemo.org/pkgweb/">
+            <img class="mr20" src="/pkgweb/logo_small_w.png" alt="logo">Maemo Package Index
+          </a>
+        </div>
+        <div class="nav pull-right">
+          <a href="https://maemo-leste.github.io">News</a>
+          <a href="https://leste.maemo.org">Wiki</a>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="description">
-    <h2>Description</h2>
-    <ul>
-      <li><p>{{.Description}}</p></li>
-      <!-- <li><p>{{.LongDescription}}</p></li> -->
-    </ul>
-  </div>
+  <div class="container content">
+    <form action="/pkgweb/search">
+      <input type="text" placeholder="Search packages..." required name="q">
+      <input type="submit" class="btn btn-primary">
+    </form>
+    <hr>
 
-  <div class="depends">
-    <h2>Depends</h2>
-    <ul>{{range .Depends}}
-      <li>{{ . }}</li>
-    {{end}}<ul>
+    <h1>{{.Package}}</h1>
+
+    {{if .Package}}<p><b>Package:</b> {{.Package}}</p>{{end}}
+    {{if .Architecture}}<p><b>Architecture:</b> {{.Architecture}}</p>{{end}}
+    {{if .Version}}<p><b>Version:</b> {{.Version}}</p>{{end}}
+    {{if .Maintainer}}<p><b>Maintainer:</b> <a href="mailto:{{.Maintainer}}">{{.Maintainer}}</a></p>{{end}}
+    {{if .Description}}<p><b>Description:</b> {{.Description}}</p>{{end}}
+    {{if .Source}}<p><b>Source Repository:</b> <a href="https://github.com/maemo-leste{{if .Extras}}-extras{{end}}/{{.Source}}">{{.Source}}</a></p>{{end}}
+    {{if .Homepage}}<p><b>Homepage:</b>  <a href="{{.Homepage}}">{{.Homepage}}</a></p>{{end}}
+    {{if .PreDepends}}<p><b>PreDepends:</b>  {{range .PreDepends}}<a href="/pkgweb/search?q={{ . }}">{{ . }}</a> {{end}}</p>{{end}}
+    {{if .Depends}}<p><b>Depends:</b>  {{range .Depends}}<a href="/pkgweb/search?q={{ . }}">{{ . }}</a> {{end}}</p>{{end}}
+    {{if .Provides}}<p><b>Provides:</b>  {{range .Provides}}<a href="/pkgweb/search?q={{ . }}">{{ . }}</a> {{end}}</p>{{end}}
+    {{if .Conflicts}}<p><b>Conflicts:</b>  {{range .Conflicts}}<a href="/pkgweb/search?q={{ . }}">{{ . }}</a> {{end}}</p>{{end}}
+    {{if .Breaks}}<p><b>Breaks:</b>  {{range .Breaks}}<a href="/pkgweb/search?q={{ . }}">{{ . }}</a> {{end}}</p>{{end}}
+    {{if .Replaces}}<p><b>Replaces:</b>  {{range .Replaces}}<a href="/pkgweb/search?q={{ . }}">{{ . }}</a> {{end}}</p>{{end}}
+    {{if .Suggests}}<p><b>Suggests:</b>  {{range .Suggests}}<a href="/pkgweb/search?q={{ . }}">{{ . }}</a> {{end}}</p>{{end}}
+    {{if .Recommends}}<p><b>Recommends:</b>  {{range .Recommends}}<a href="/pkgweb/search?q={{ . }}">{{ . }}</a> {{end}}</p>{{end}}
+    {{if .Section}}<p><b>Section:</b>  {{.Section}}</p>{{end}}
+    {{if .Priority}}<p><b>Priority:</b>  {{.Priority}}</p>{{end}}
+    {{if .Filename}}<p><b>Filename:</b>  <a href="https://maedevu.maemo.org/{{if .Extras}}extras{{else}}leste{{end}}/{{.Filename}}">{{.Filename}}</a></p>{{end}}
+    {{if .Size}}<p><b>Size:</b> {{.Size}}</p>{{end}}
+    {{if .InstalledSize}}<p><b>Installed-Size:</b> {{.InstalledSize}}</p>{{end}}
+    {{if .MD5sum}}<p><b>MD5sum:</b> {{.MD5sum}}</p>{{end}}
+    {{if .SHA1}}<p><b>SHA1:</b>  {{.SHA1}}</p>{{end}}
+    {{if .SHA256}}<p><b>SHA256:</b> {{.SHA256}}</p>{{end}}
+    <hr>
   </div>
 </body>
 </html>
-
