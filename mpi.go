@@ -211,9 +211,10 @@ func parsePackages(pkgs string) error {
 func main() {
 	var indexes = []string{}
 
-	for _, arch := range architectures {
+	for _, suite := range suites {
+		os.RemoveAll(strings.Join([]string{outputPath, suite}, "/"))
 		for _, comp := range components {
-			for _, suite := range suites {
+			for _, arch := range architectures {
 				indexes = append(indexes, strings.Join([]string{
 					mainurl, suite, comp, arch, "Packages.gz"}, "/"))
 				indexes = append(indexes, strings.Join([]string{
