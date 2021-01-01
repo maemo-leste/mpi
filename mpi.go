@@ -3,12 +3,12 @@ package main
 import (
 	"bufio"
 	"compress/gzip"
-	"html/template"
 	"log"
 	"net/http"
 	"os"
 	"strings"
 	"sync"
+	"text/template"
 )
 
 type Package struct {

@@ -4,6 +4,15 @@
 Package: {{.Package}}
 Architecture: {{.Architecture}}
 Version: {{.Version}}
+Maintainer: {{.Maintainer}}
+Pre-Depends: {{range .PreDepends}} {{.}}{{end}}
+Depends: {{range .Depends}} {{.}}{{end}}
+Provides: {{range .Provides}} {{.}}{{end}}
+Conflicts: {{range .Conflicts}} {{.}}{{end}}
+Breaks: {{range .Breaks}} {{.}}{{end}}
+Replaces: {{range .Replaces}} {{.}}{{end}}
+Suggests: {{range .Suggests}} {{.}}{{end}}
+Recommends: {{range .Recommends}} {{.}}{{end}}
 Extras: {{.Extras}}
 -->
 <head>
