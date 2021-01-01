@@ -87,8 +87,15 @@ search_pkgs() {
 }
 
 if [ -n "$CGI" ]; then
-	QUERY="$(printf "%s" "$REQUEST_URI" | awk -F'q=' '{print $2}' \
-		awk -F'%20' '{print $1}')"
+	QUERY="$(printf "%s" "$REQUEST_URI" | sed 's,/pkgweb/search?q=',,)"
+	case "$QUERY" in
+	*%20*)
+		QUERY="$(printf "%s" "$QUERY" | sed 's,%20.*,,')"
+		;;
+	*%3A*)
+		QUERY="$(printf "%s" "$QUERY" | sed 's,%3A,:,')"
+		;;
+	esac
 
 	print_head
 
