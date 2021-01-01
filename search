@@ -1,10 +1,9 @@
 #!/bin/sh
 
-PKGPATHS="${DOCUMENT_ROOT}/pkgweb/beowulf ${DOCUMENT_ROOT}/pkgweb/beowulf-devel"
+[ -n "$REQUEST_URI" ] && CGI=1
 
-QUERY="$(printf "%s" "$REQUEST_URI" | awk -F'q=' '{print $2}' | awk -F'%20' '{print $1}')"
-
-cat <<EOF
+print_head() {
+	cat <<EOF
 Content-Type: text/html
 
 <!DOCTYPE html>
@@ -24,48 +23,35 @@ Content-Type: text/html
       <div class="header-nav">
         <div class="header-logo">
           <a class="pull-left" href="https://maedevu.maemo.org/pkgweb/">
-            <img class="mr20" src="/pkgweb/logo_small_w.png" alt="logo">Maemo Package Index
+            <img class="mr20" src="/pkgweb/logo_small-w.png" alt="logo">Maemo Package Index
           </a>
-       </div>
-       <div class="nav pull-right">
-         <a href="https://maemo-leste.github.io">News</a>
-         <a href="https://leste.maemo.org">Wiki</a>
-       </div>
-     </div>
-   </div>
+        </div>
+        <div class="nav pull-right">
+          <a href="https://maemo-leste.github.io">News</a>
+          <a href="https://leste.maemo.org">Wiki</a>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="container content">
     <form action="/pkgweb/search">
-      <input type="text" placeholder="$QUERY" requred name="q">
+      <input type="text" placeholder="$QUERY" required name="q">
       <input type="submit" class="btn btn-primary">
     </form>
     <hr>
 
 EOF
+}
 
-beowulf_pkgs="$(find "${DOCUMENT_ROOT}/pkgweb/beowulf" -type f -name "*${QUERY}*.html" \
-	| sed -e "s,${DOCUMENT_ROOT}/pkgweb/beowulf/,," -e 's,\.html$,,' | sort -u)"
+print_foot() {
+	cat <<EOF
+</body>
+</html>
+EOF
+}
 
-if [ -n "$beowulf_pkgs" ]; then
-	echo "    <h2>Packages found in beowulf:</h2>"
-	for i in $beowulf_pkgs; do
-		echo "<a href=\"/pkgweb/beowulf/${i}.html\">$i</a><br>"
-	done
-fi
-
-beowulfdevel_pkgs="$(find "${DOCUMENT_ROOT}/pkgweb/beowulf-devel" -type f -name "*${QUERY}*.html" \
-	| sed -e "s,${DOCUMENT_ROOT}/pkgweb/beowulf-devel/,," -e 's,\.html$,,' | sort -u)"
-
-if [ -n "$beowulfdevel_pkgs" ]; then
-	echo "    <h2>Packages found in beowulf-devel:</h2>"
-	for i in $beowulfdevel_pkgs; do
-		echo "<a href=\"/pkgweb/beowulf-devel/${i}.html\">$i</a><br>"
-	done
-fi
-
-if [ -z "$beowulf_pkgs" ] && [ -z "$beowulfdevel_pkgs" ]; then
-
+print_noresult() {
 	cat <<EOF
 <p>It seems there are no results for <b>$QUERY</b> in Maemo Leste. Perhaps try
 searching upstream Devuan using the following link:</p>
@@ -73,12 +59,82 @@ searching upstream Devuan using the following link:</p>
 <p><a href="https://pkginfo.devuan.org/xsl-bin/policy-query.html?c=package&q=${QUERY}">
 https://pkginfo.devuan.org/xsl-bin/policy-query.html?c=package&q=${QUERY}</a></p>
 EOF
+}
 
+search_pkgs() {
+	if [ -n "$CGI" ]; then
+		p="${DOCUMENT_ROOT}/pkgweb/$1/"
+	else
+		p="./$1/"
+	fi
+
+	case "$2" in
+	architecture:*|version:*|maintainer:*|pre-depends:*|depends:*|provides:*|\
+	conflicts:*|breaks:*|replaces:*|suggests:*|recommends:*)
+		h="$(printf "%s" "$2" | cut -d: -f1)"
+		q="$(printf "%s" "$2" | cut -d: -f2)"
+
+		find "$p" -type f -name '*.html' | while read -r pkg; do
+			if grep -qi "^${h}: .*${q}.*" "$pkg"; then
+				echo "$pkg" | sed -e "s,$p,," -e 's,\.html$,,'
+			fi
+		done
+		;;
+	*)
+		find "$p" -type f -name "*${2}*.html" | sed -e "s,$p,," -e 's,\.html,,'
+		;;
+	esac
+}
+
+if [ -n "$CGI" ]; then
+	QUERY="$(printf "%s" "$REQUEST_URI" | awk -F'q=' '{print $2}' \
+		awk -F'%20' '{print $1}')"
+
+	print_head
+
+	beowulf_pkgs="$(search_pkgs beowulf "$QUERY" | sort -u)"
+	beowulfdevel_pkgs="$(search_pkgs beowulf-devel "$QUERY" | sort -u)"
+
+	if [ -n "$beowulf_pkgs" ]; then
+		echo "    <h2>Packages found in beowulf:</h2>"
+		for i in $beowulf_pkgs; do
+			echo "    <a href=\"/pkgweb/beowulf/${i}.html\">$i</a><br>"
+		done
+	fi
+
+	if [ -n "$beowulfdevel_pkgs" ]; then
+		echo "    <h2>Packages found in beowulf-devel:</h2>"
+		for i in $beowulfdevel_pkgs; do
+			echo "    <a href=\"/pkgweb/beowulf-devel/${i}.html\">$i</a><br>"
+		done
+	fi
+
+	if [ -z "$beowulf_pkgs" ] && [ -z "$beowulfdevel_pkgs" ]; then
+		print_noresult
+	fi
+
+	print_foot
+	exit 0
+else
+	QUERY="$1"
+
+	beowulf_pkgs="$(search_pkgs beowulf "$QUERY" | sort -u)"
+	beowulfdevel_pkgs="$(search_pkgs beowulf-devel "$QUERY" | sort -u)"
+
+	if [ -n "$beowulf_pkgs" ]; then
+		for i in $beowulf_pkgs; do
+			echo "./beowulf/${i}.html"
+		done
+	fi
+
+	if [ -n "$beowulfdevel_pkgs" ]; then
+		for i in $beowulfdevel_pkgs; do
+			echo "./beowulf-devel/${i}.html"
+		done
+	fi
+
+	if [ -z "$beowulf_pkgs" ] && [ -z "$beowulfdevel_pkgs" ]; then
+		echo "No results."
+		exit 1
+	fi
 fi
-
-cat <<EOF
-</body>
-</html>
-EOF
-
-exit 0
