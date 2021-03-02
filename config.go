@@ -16,6 +16,7 @@ var components = []string{
 	"lima",
 	"pinephone",
 	"raspberrypi",
+	"sunxi",
 }
 
 var mainurl = "https://maedevu.maemo.org/leste/dists"
