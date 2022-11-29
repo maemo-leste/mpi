@@ -70,7 +70,7 @@ search_pkgs() {
 
 	case "$2" in
 	architecture:*|version:*|maintainer:*|pre-depends:*|depends:*|provides:*|\
-	conflicts:*|breaks:*|replaces:*|suggests:*|recommends:*)
+	conflicts:*|breaks:*|replaces:*|suggests:*|recommends:*|section:*)
 		h="$(printf "%s" "$2" | cut -d: -f1)"
 		q="$(printf "%s" "$2" | cut -d: -f2)"
 
@@ -101,6 +101,7 @@ if [ -n "$CGI" ]; then
 
 	beowulf_pkgs="$(search_pkgs beowulf "$QUERY" | sort -u)"
 	beowulfdevel_pkgs="$(search_pkgs beowulf-devel "$QUERY" | sort -u)"
+	chimaera_pkgs="$(search_pkgs chimaera "$QUERY" | sort -u)"
 
 	if [ -n "$beowulf_pkgs" ]; then
 		echo "    <h2>Packages found in beowulf:</h2>"
@@ -116,7 +117,14 @@ if [ -n "$CGI" ]; then
 		done
 	fi
 
-	if [ -z "$beowulf_pkgs" ] && [ -z "$beowulfdevel_pkgs" ]; then
+	if [ -n "$chimaera_pkgs" ]; then
+		echo "    <h2>Packages found in chimaera:</h2>"
+		for i in $chimaera_pkgs; do
+				echo "    <a href=\"/pkgweb/chimaera/${i}.html\">$i</a><br>"
+		done
+	fi
+
+	if [ -z "$beowulf_pkgs" ] && [ -z "$beowulfdevel_pkgs" ] && [ -z "$chimaera_pkgs" ]; then
 		print_noresult
 	fi
 
@@ -127,6 +135,8 @@ else
 
 	beowulf_pkgs="$(search_pkgs beowulf "$QUERY" | sort -u)"
 	beowulfdevel_pkgs="$(search_pkgs beowulf-devel "$QUERY" | sort -u)"
+	chimaera_pkgs="$(search_pkgs chimaera "$QUERY" | sort -u)"
+
 
 	if [ -n "$beowulf_pkgs" ]; then
 		for i in $beowulf_pkgs; do
@@ -140,7 +150,14 @@ else
 		done
 	fi
 
-	if [ -z "$beowulf_pkgs" ] && [ -z "$beowulfdevel_pkgs" ]; then
+	if [ -n "$chimaera_pkgs" ]; then
+		echo "    <h2>Packages found in chimaera:</h2>"
+		for i in $chimaera_pkgs; do
+				echo "    <a href=\"/pkgweb/chimaera/${i}.html\">$i</a><br>"
+		done
+	fi
+
+	if [ -z "$beowulf_pkgs" ] && [ -z "$beowulfdevel_pkgs" ] && [ -z "$chimaera_pkgs" ]; then
 		echo "No results."
 		exit 1
 	fi

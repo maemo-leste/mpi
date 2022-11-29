@@ -23,4 +23,4 @@ var components = []string{
 var mainurl = "https://maedevu.maemo.org/leste/dists"
 var extrasurl = "https://maedevu.maemo.org/extras/dists"
 
-var suites = []string{"beowulf", "beowulf-devel"}
+var suites = []string{"beowulf", "beowulf-devel", "chimaera"}
