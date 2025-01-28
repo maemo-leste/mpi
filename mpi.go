@@ -224,16 +224,19 @@ func main() {
 	}
 
 	var wg sync.WaitGroup
-	wg.Add(len(indexes))
+	maxChan := make(chan string, 100);
 
 	for _, i := range indexes {
-		go func(i string) {
+		maxChan <- i
+		wg.Add(1)
+		go func(i string, maxChan chan string) {
 			defer wg.Done()
+			defer func(maxChan chan string) { <-maxChan }(maxChan)
 			err := parsePackages(i)
 			if err != nil {
 				log.Fatal(err)
 			}
-		}(i)
+		}(i, maxChan)
 	}
 
 	wg.Wait()
