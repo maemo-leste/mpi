@@ -102,6 +102,17 @@ if [ -n "$CGI" ]; then
 	beowulf_pkgs="$(search_pkgs beowulf "$QUERY" | sort -u)"
 	beowulfdevel_pkgs="$(search_pkgs beowulf-devel "$QUERY" | sort -u)"
 	chimaera_pkgs="$(search_pkgs chimaera "$QUERY" | sort -u)"
+	chimaera_testing_pkgs="$(search_pkgs chimaera-testing "$QUERY" | sort -u)"
+	chimaera_devel_pkgs="$(search_pkgs chimaera-devel "$QUERY" | sort -u)"
+	chimaera_experimental_pkgs="$(search_pkgs chimaera-experimental "$QUERY" | sort -u)"
+	daedalus_pkgs="$(search_pkgs daedalus "$QUERY" | sort -u)"
+	daedalus_testing_pkgs="$(search_pkgs daedalus-testing "$QUERY" | sort -u)"
+	daedalus_devel_pkgs="$(search_pkgs daedalus-devel "$QUERY" | sort -u)"
+	daedalus_experimental_pkgs="$(search_pkgs daedalus-experimental "$QUERY" | sort -u)"
+	excalibur_pkgs="$(search_pkgs excalibur "$QUERY" | sort -u)"
+	excalibur_testing_pkgs="$(search_pkgs excalibur-testing "$QUERY" | sort -u)"
+	excalibur_devel_pkgs="$(search_pkgs excalibur-devel "$QUERY" | sort -u)"
+	excalibur_experimental_pkgs="$(search_pkgs excalibur-experimental "$QUERY" | sort -u)"
 
 	if [ -n "$beowulf_pkgs" ]; then
 		echo "    <h2>Packages found in beowulf:</h2>"
@@ -124,7 +135,84 @@ if [ -n "$CGI" ]; then
 		done
 	fi
 
-	if [ -z "$beowulf_pkgs" ] && [ -z "$beowulfdevel_pkgs" ] && [ -z "$chimaera_pkgs" ]; then
+	if [ -n "$chimaera_testing_pkgs" ]; then
+		echo "    <h2>Packages found in chimaera-testing:</h2>"
+		for i in $chimaera_testing_pkgs; do
+				echo "    <a href=\"/pkgweb/chimaera-testing/${i}.html\">$i</a><br>"
+		done
+	fi
+
+	if [ -n "$chimaera_devel_pkgs" ]; then
+		echo "    <h2>Packages found in chimaera-devel:</h2>"
+		for i in $chimaera_devel_pkgs; do
+				echo "    <a href=\"/pkgweb/chimaera-devel/${i}.html\">$i</a><br>"
+		done
+	fi
+
+	if [ -n "$chimaera_experimental_pkgs" ]; then
+		echo "    <h2>Packages found in chimaera-experimental:</h2>"
+		for i in $chimaera_experimental_pkgs; do
+				echo "    <a href=\"/pkgweb/chimaera-experimental/${i}.html\">$i</a><br>"
+		done
+	fi
+
+	if [ -n "$daedalus_pkgs" ]; then
+		echo "    <h2>Packages found in daedalus:</h2>"
+		for i in $daedalus_pkgs; do
+				echo "    <a href=\"/pkgweb/daedalus/${i}.html\">$i</a><br>"
+		done
+	fi
+
+	if [ -n "$daedalus_testing_pkgs" ]; then
+		echo "    <h2>Packages found in daedalus-testing:</h2>"
+		for i in $daedalus_testing_pkgs; do
+				echo "    <a href=\"/pkgweb/daedalus-testing/${i}.html\">$i</a><br>"
+		done
+	fi
+
+	if [ -n "$daedalus_devel_pkgs" ]; then
+		echo "    <h2>Packages found in daedalus-devel:</h2>"
+		for i in $daedalus_devel_pkgs; do
+				echo "    <a href=\"/pkgweb/daedalus-devel/${i}.html\">$i</a><br>"
+		done
+	fi
+
+	if [ -n "$daedalus_experimental_pkgs" ]; then
+		echo "    <h2>Packages found in daedalus-experimental:</h2>"
+		for i in $daedalus_experimental_pkgs; do
+				echo "    <a href=\"/pkgweb/daedalus-experimental/${i}.html\">$i</a><br>"
+		done
+	fi
+
+	if [ -n "$excalibur_pkgs" ]; then
+		echo "    <h2>Packages found in excalibur:</h2>"
+		for i in $excalibur_pkgs; do
+				echo "    <a href=\"/pkgweb/excalibur/${i}.html\">$i</a><br>"
+		done
+	fi
+
+	if [ -n "$excalibur_testing_pkgs" ]; then
+		echo "    <h2>Packages found in excalibur-testing:</h2>"
+		for i in $excalibur_testing_pkgs; do
+				echo "    <a href=\"/pkgweb/excalibur-testing/${i}.html\">$i</a><br>"
+		done
+	fi
+
+	if [ -n "$excalibur_devel_pkgs" ]; then
+		echo "    <h2>Packages found in excalibur-devel:</h2>"
+		for i in $excalibur_devel_pkgs; do
+				echo "    <a href=\"/pkgweb/excalibur-devel/${i}.html\">$i</a><br>"
+		done
+	fi
+
+	if [ -n "$excalibur_experimental_pkgs" ]; then
+		echo "    <h2>Packages found in excalibur-experimental:</h2>"
+		for i in $excalibur_experimental_pkgs; do
+				echo "    <a href=\"/pkgweb/excalibur-experimental/${i}.html\">$i</a><br>"
+		done
+	fi
+
+	if [ -z "$beowulf_pkgs" ] && [ -z "$beowulfdevel_pkgs" ] && [ -z "$chimaera_pkgs" ] && [ -z "$chimaera_testing_pkgs" ] && [ -z "$chimaera_devel_pkgs" ] && [ -z "$chimaera_experimental_pkgs" && [ -z "$daedalus_pkgs" ] && [ -z "$daedalus_testing_pkgs" ] && [ -z "$daedalus_devel_pkgs" ] && [ -z "$daedalus_experimental_pkgs"] && [ -z "$excalibur_pkgs" ] && [ -z "$excalibur_testing_pkgs" ] && [ -z "$excalibur_devel_pkgs" ] && [ -z "$excalibur_experimental_pkgs"]; then
 		print_noresult
 	fi
 
@@ -157,7 +245,28 @@ else
 		done
 	fi
 
-	if [ -z "$beowulf_pkgs" ] && [ -z "$beowulfdevel_pkgs" ] && [ -z "$chimaera_pkgs" ]; then
+	if [ -n "$chimaera_testing_pkgs" ]; then
+		echo "    <h2>Packages found in chimaera-testing:</h2>"
+		for i in $chimaera_testing_pkgs; do
+				echo "    <a href=\"/pkgweb/chimaera-testing/${i}.html\">$i</a><br>"
+		done
+	fi
+
+	if [ -n "$chimaera_devel_pkgs" ]; then
+		echo "    <h2>Packages found in chimaera-devel:</h2>"
+		for i in $chimaera_devel_pkgs; do
+				echo "    <a href=\"/pkgweb/chimaera-devel/${i}.html\">$i</a><br>"
+		done
+	fi
+
+	if [ -n "$chimaera_experimental_pkgs" ]; then
+		echo "    <h2>Packages found in chimaera-experimental:</h2>"
+		for i in $chimaera_experimental_pkgs; do
+				echo "    <a href=\"/pkgweb/chimaera-experimental/${i}.html\">$i</a><br>"
+		done
+	fi
+
+	if [ -z "$beowulf_pkgs" ] && [ -z "$beowulfdevel_pkgs" ] && [ -z "$chimaera_pkgs" ] && [ -z "$chimaera_testing_pkgs" ] && [ -z "$chimaera_devel_pkgs" ] && [ -z "$chimaera_experimental_pkgs" ]; then
 		echo "No results."
 		exit 1
 	fi
