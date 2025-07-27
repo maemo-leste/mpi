@@ -173,13 +173,39 @@ func scanStanza(stream *bufio.Scanner) (map[string]string, error) {
 	return s, err
 }
 
-func parsePackages(pkgs string) error {
+func parsePackages(url, suite, comp, arch string) error {
 	//log.Println("Fetching and parsing", pkgs)
+	pkgs := strings.Join([]string{url, suite, comp, arch, "Packages.gz"}, "/")
 
-	f, err := http.Get(pkgs)
+	f, err := http.Head(pkgs)
 	if err != nil {
 		return err
 	}
+
+	if f.StatusCode != 200 {
+		return nil
+	}
+
+	last_modified, err := http.ParseTime(f.Header["Last-Modified"][0])
+	if err != nil {
+		return err
+	}
+
+	f, err = http.Get(pkgs)
+	if err != nil {
+		return err
+	}
+
+	checkpath := strings.Join([]string{outputPath, suite, comp, arch}, "/")
+	if fi, err := os.Stat(checkpath); err == nil {
+		modtime := fi.ModTime()
+
+		if last_modified.Before(modtime) {
+			return nil
+		}
+	}
+
+	os.RemoveAll(strings.Join([]string{outputPath, suite, comp, arch}, "/"))
 
 	uncompressed, err := gzip.NewReader(f.Body)
 	if err != nil {
@@ -209,34 +235,27 @@ func parsePackages(pkgs string) error {
 }
 
 func main() {
-	var indexes = []string{}
+	var wg sync.WaitGroup
+	maxChan := make(chan string, 100)
 
 	for _, suite := range suites {
-		os.RemoveAll(strings.Join([]string{outputPath, suite}, "/"))
 		for _, comp := range components {
 			for _, arch := range architectures {
-				indexes = append(indexes, strings.Join([]string{
-					mainurl, suite, comp, arch, "Packages.gz"}, "/"))
-				indexes = append(indexes, strings.Join([]string{
-					extrasurl, suite, comp, arch, "Packages.gz"}, "/"))
+				for _, url := range []string{mainurl, extrasurl} {
+					pkgs := strings.Join([]string{url, suite, comp, arch, "Packages.gz"}, "/")
+					maxChan <- pkgs
+					wg.Add(1)
+					go func(maxChan chan string) {
+						defer wg.Done()
+						defer func(maxChan chan string) { <-maxChan }(maxChan)
+						err := parsePackages(url, suite, comp, arch)
+						if err != nil {
+							log.Fatal(err)
+						}
+					}(maxChan)
+				}
 			}
 		}
-	}
-
-	var wg sync.WaitGroup
-	maxChan := make(chan string, 100);
-
-	for _, i := range indexes {
-		maxChan <- i
-		wg.Add(1)
-		go func(i string, maxChan chan string) {
-			defer wg.Done()
-			defer func(maxChan chan string) { <-maxChan }(maxChan)
-			err := parsePackages(i)
-			if err != nil {
-				log.Fatal(err)
-			}
-		}(i, maxChan)
 	}
 
 	wg.Wait()
