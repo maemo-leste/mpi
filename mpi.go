@@ -245,14 +245,14 @@ func main() {
 					pkgs := strings.Join([]string{url, suite, comp, arch, "Packages.gz"}, "/")
 					maxChan <- pkgs
 					wg.Add(1)
-					go func(maxChan chan string) {
+					go func(url, suite, comp, arch string, maxChan chan string) {
 						defer wg.Done()
 						defer func(maxChan chan string) { <-maxChan }(maxChan)
 						err := parsePackages(url, suite, comp, arch)
 						if err != nil {
 							log.Fatal(err)
 						}
-					}(maxChan)
+					}(url, suite, comp, arch, maxChan)
 				}
 			}
 		}
